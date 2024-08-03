@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # coding:  utf-8
 import fire
-__author__ = 'T3rry'
+__author__ = 'PanXXHH'
 
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from Crypto.Util.number import bytes_to_long, long_to_bytes
@@ -9,7 +9,7 @@ from Crypto.Cipher import PKCS1_v1_5, AES
 from Crypto.PublicKey import RSA
 from Crypto import Random
 from ecdsa import ECDH, NIST224p, SigningKey
-from binascii import a2b_hex, b2a_hex
+from binascii import a2b_hex
 import hashlib
 import base64
 import lz4.block
@@ -21,12 +21,15 @@ import platform
 import json
 import requests
 import random
-import getopt
+# import getopt
 import ctypes
 import codecs
 import urllib
 # import importlib
 from dotenv import load_dotenv
+from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor
+import utils
+
 
 # # 加载.env文件
 # load_dotenv()
@@ -326,7 +329,7 @@ class Fake115Client(object):
         r = requests.post(url,  data=(
             postData.encode('utf8')), headers=self.header)
 
-        print("r.content",r.content)
+        print("r.content", r.content)
 
         response = (r.content)
 
@@ -443,7 +446,7 @@ class Fake115Client(object):
                 return
             self.import_file_with_sha1(preid, fileid, filesize, filename)
 
-    def upload_file(self, filename):
+    def upload_file(self, filename, free=False):
         # if self.upload_file_with_sha1(filename):
         #     return
 
@@ -455,60 +458,118 @@ class Fake115Client(object):
         r = requests.post(uri, headers=self.header, data=postdata)
         resp = json.loads(r.content)
 
-        req_headers = {
-            'Content-Type':  "multipart/form-data;  boundary=----7d4a6d158c9"}
-        m = MultipartEncoder(fields=[('name',  os.path.basename(filename)),
-                                     ('key',  resp['object']),
-                                     ('policy', resp['policy']),
-                                     ('OSSAccessKeyId',  resp['accessid']),
-                                     ('success_action_status',  '200'),
-                                     ('callback', resp['callback']),
-                                     ('signature', resp['signature']),
-                                     ('file', (os.path.basename(filename), open(filename,  'rb'),  'video/mp4'))],
-                             boundary='----7d4a6d158c9'
-                             )
-        r = requests.post(resp['host'], headers=req_headers, data=m)
-        print(r.content)
+        with open(filename, 'rb') as file:
+            # 构建 MultipartEncoder 对象
+            m = MultipartEncoder(
+                fields={
+                    "name": os.path.basename(filename),
+                    "key": resp['object'],
+                    "policy": resp['policy'],
+                    "OSSAccessKeyId": resp['accessid'],
+                    "success_action_status": '200',
+                    "callback": resp['callback'],
+                    "signature": resp['signature'],
+                    "file": (os.path.basename(filename), file, "multipart/form-data")
+                }
+            )
+
+            # 创建 MultipartEncoderMonitor 监控对象
+            monitor = MultipartEncoderMonitor(m, callback=utils.upload_progress)
+
+            # 发送 POST 请求，包含进度监控
+            r = requests.post(resp['host'], data=monitor, headers={'Content-Type': monitor.content_type})
+            print(r.content)
+            # print("\n上传完成")
         try:
             if json.loads(r.content)['state'] == True and json.loads(r.content)['code'] == 0:
                 self.log(os.path.basename(filename) +
-                         '  upload  completed.', False, "OK")
+                         ' 文件已上传完成。', False, "OK")
+                if free:
+                    # 打开文件并清空内容
+                    with open(filename, 'w') as file:
+                        file.write(r.content)
+                        pass  # 打开文件的写入模式会自动清空文件
+
+                    # 构建新的文件名
+                    new_file_path = filename + ".uploaded"
+
+                    # 重命名文件
+                    os.rename(filename, new_file_path)
+                    self.log(os.path.basename(filename) +
+                            ' 文件已释放。', False, "OK")
             else:
                 self.log(os.path.basename(filename) +
                          '  upload  failed.', False, "OK")
         except Exception as e:
             print('error', e)
 
-    # def  upload_folder(self,filename):
-    #         if  self.upload_file_with_sha1(filename):
-    #                 return
 
-    #         self.log("Trying  local  upload...", False, "INFO")
-    #         uri = 'http://uplb.115.com/3.0/sampleinitupload.php'
+        return
 
-    #         postdata={"userid":self.user_id,"filename":os.path.basename(filename),"filesize":self.get_file_size(filename),"target":"U_1_"+str(self.cid)}
-    #         r  =  requests.post(uri,headers=self.header,data=postdata)
-    #         resp=json.loads(r.content)
+        # req_headers = {
+        #     'Content-Type':  "multipart/form-data;  boundary=----7d4a6d158c9"}
+        with open(filename,  'rb') as file:
+            # m = MultipartEncoder(fields=[('name',  os.path.basename(filename)),
+            #                             ('key',  resp['object']),
+            #                             ('policy', resp['policy']),
+            #                             ('OSSAccessKeyId',  resp['accessid']),
+            #                             ('success_action_status',  '200'),
+            #                             ('callback', resp['callback']),
+            #                             ('signature', resp['signature']),
+            #                             ('file', (os.path.basename(filename), file,  'video/mp4'))],
+            #                     boundary='----7d4a6d158c9'
+            #                     )
+            # r = requests.post(resp['host'], headers=req_headers, data=m)
+            # 表单数据
+            data = {
+                "name": os.path.basename(filename),
+                "key":  resp['object'],
+                "policy": resp['policy'],
+                "OSSAccessKeyId":resp['accessid'],
+                "success_action_status": '200',
+                "callback": resp['callback'],
+                "signature": resp['signature'],
+            }
 
-    #         req_headers  =  {'Content-Type':  "multipart/form-data;  boundary=----7d4a6d158c9"}
-    #         m = MultipartEncoder(fields=[('name',  os.path.basename(filename)),
-    #                                                            ('key',  resp['object']),
-    #                                                            ('policy',resp['policy']),
-    #                                                            ('OSSAccessKeyId',  resp['accessid']),
-    #                                                            ('success_action_status',  '200'),
-    #                                                            (  'callback',resp['callback']),
-    #                                                            ('signature',resp['signature']),
-    #                                                            ('file',(os.path.basename(filename),open(filename,  'rb'),  'video/mp4'))],
-    #                                                            boundary='----7d4a6d158c9'
-    #                                          )
-    #         r  =  requests.post(resp['host'],headers=req_headers,data=m)
-    #         try:
-    #                  if  json.loads(r.content)['state']==True  and  json.loads(r.content)['code']==0:
-    #                          self.log(os.path.basename(filename)+'  upload  completed.',False,"OK")
-    #                  else:
-    #                          self.log(os.path.basename(filename)+'  upload  failed.',False,"OK")
-    #         except Exception as e:
-    #                  print('error',e)
+            # 文件数据
+            files = {
+                "file": (os.path.basename(filename), file, "multipart/form-data")
+            }
+
+            # m = MultipartEncoder(fields=[('name',  os.path.basename(filename)),
+            #                             ('key',  resp['object']),
+            #                             ('policy', resp['policy']),
+            #                             ('OSSAccessKeyId',  resp['accessid']),
+            #                             ('success_action_status',  '200'),
+            #                             ('callback', resp['callback']),
+            #                             ('signature', resp['signature']),
+            #                             ('file', (os.path.basename(filename), file,  'video/mp4'))],
+            #                     boundary='----7d4a6d158c9'
+            #                     )
+            r = requests.post(resp['host'], data=data, files=files)
+            print(r.content)
+        try:
+            if json.loads(r.content)['state'] == True and json.loads(r.content)['code'] == 0:
+                self.log(os.path.basename(filename) +
+                         '  upload  completed.', False, "OK")
+                if free:
+                    # 打开文件并清空内容
+                    with open(filename, 'w') as file:
+                        file.write(r.content)
+                        pass  # 打开文件的写入模式会自动清空文件
+
+                    # 构建新的文件名
+                    new_file_path = filename + ".uploaded"
+
+                    # 重命名文件
+                    os.rename(filename, new_file_path)
+                    self.log(os.path.basename(filename) +
+                            ' 文件已释放。', False, "OK")
+            else:
+                self.log(os.path.basename(filename) +
+                         '  upload  failed.', False, "OK")
+        except Exception as e:
+            print('error', e)
 
     def build_links_from_disk(self, outfile):
         self.log(os.getcwd(), False, 'PATH')
@@ -565,24 +626,21 @@ Usage:
 
 
 class Main:
-    def __init__(self, targetpath=None, c=None, cid=None, cookies=None):
+    def __init__(self, targetpath=None, c=None, cid=None, cookies=None, free=None):
         self._targetpath = targetpath or '.'
         self._cid = c or cid
-        # print(self._cid,c,cid)
+        self._free = free or False
         # 加载.env文件
         load_dotenv()
         # 读取COOKIE变量
         self._cookies = cookies or os.getenv('COOKIE', 'need your cookie')
 
         print(self._cookies)
-        # print(targetpath, c, cid)
-        # sys.exit()
-        # return
+
         if self._targetpath == None:
             print("请传入targetpath作为目标路径", sys.stderr)
             input("按任意键结束...")
             sys.exit()
-        # print(self.cid, c, cid)
 
         self.cli = Fake115Client(self._cookies)
 
@@ -593,19 +651,6 @@ class Main:
         if self._cid != None:
             self.cli.cid = self._cid
             self.cli.show_folder_path()
-        # self.targetpath = targetpath
-
-        # global global_targetpath
-        # global_targetpath = self.targetpath or '.'
-        # if command == None or value == None:
-        #     usage()
-        #     input("按任意键结束...")
-        #     sys.exit()
-
-        # self.cid = cid
-        # self.cli = Fake115Client(COOKIE)
-        # if not self.cli.user_key:
-        #     sys.exit("无法获取用户密钥")
 
     def upload(self, filename):
         if filename == None:
@@ -613,7 +658,7 @@ class Main:
             input("按任意键结束...")
             return
 
-        self.cli.upload_file(filename)
+        self.cli.upload_file(filename, free=self._free)
 
     def infile(self, filename):
         if filename == None:
@@ -640,82 +685,6 @@ class Main:
 
         self.cli.build_links_from_disk(filename)
 
-# def main(targetpath=None, command=None,  value=None, c=None, cid=None):
-#     if targetpath == None:
-#         print("请传入targetpath作为目标路径", sys.stderr)
-#         input("按任意键结束...")
-#         sys.exit()
-#     if command == None or value == None:
-#         usage()
-#         input("按任意键结束...")
-#         sys.exit()
-
-#     global global_targetpath
-#     global_targetpath = targetpath or '.'
-#     cli = Fake115Client(COOKIE)
-
-#     if cli.user_key == None:
-#         sys.exit()
-
-#     _cid = c or cid
-#     print(_cid, c, cid)
-#     if _cid != None:
-#         cli.cid = _cid
-#         cli.show_folder_path()
-
-#     if command in ("-u", "--upload"):
-#         cli.upload_file(value)
-#         # create_shortcut_from_yaml()
-#     elif command in ('-i', '--infile'):
-#         cli.import_file_from_link(value)
-#     elif command in ('-o', '--outfile'):
-#         cli.export_link_to_file(value, cli.cid)
-#         print('Total  file  count  :', cli.filecount)
-#     elif command in ('-b', '--build'):
-#         cli.build_links_from_disk(value)
-#     else:
-#         usage()
-#         input("按任意键结束...")
-#         sys.exit()
-    # cutmovie(filename=command,all=all)
-    # if command is None:
-    #     setup_default_directory()
-
 
 if __name__ == '__main__':
-    # cli = CLI()
     fire.Fire(Main)
-
-# if __name__ == '__main__':
-
-    # if len(sys.argv) < 2:
-    #     usage()
-    #     sys.exit()
-
-    # cli = Fake115Client(COOKIE)
-
-    # if cli.user_key == None:
-    #     sys.exit()
-
-    # try:
-    #     opts,  args = getopt.getopt(
-    #         sys.argv[1:],  "u:i:o:b:c:",  ["help",  "output="])
-    #     for n, v in opts:
-    #         if n in ('-c', '--cid'):
-    #             cli.cid = v
-    #             cli.show_folder_path()
-    # for n, v in opts:
-    # if n in ('-u', '--upload'):
-    #     cli.upload_file(v)
-    # elif  n  in  ('-uf','--upload folder'):
-    #         cli.upload_folder(v)
-    # elif n in ('-i', '--infile'):
-    #     cli.import_file_from_link(v)
-    # elif n in ('-o', '--outfile'):
-    #     cli.export_link_to_file(v, cli.cid)
-    #     print('Total  file  count  :', cli.filecount)
-    # elif n in ('-b', '--build'):
-    #     cli.build_links_from_disk(v)
-
-    # except getopt.GetoptError:
-    #     print("Argv  error,please  input")
