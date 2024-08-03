@@ -1,0 +1,10 @@
+"""Init namespace"""
+
+__version__ = "1.0.0.0"
+__license__ = "MIT License"
+__author__ = "PanXXHH"
+__copyright__ = "Copyright (C) 2024 PanXXHH <https://github.com/PanXXHH>"
+__repository_url__ = "https://github.com/PanXXHH/Fake115Upload"
+__original_author__ = "T3rry7f <https://github.com/T3rry7f>"
+__original_version__ = "1.0"
+__original_repository_url__ = "https://github.com/T3rry7f/Fake115Upload"
