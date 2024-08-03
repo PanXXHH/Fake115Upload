@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 # coding:  utf-8
+import fire
 __author__ = 'T3rry'
 
 from requests_toolbelt.multipart.encoder import MultipartEncoder
@@ -27,13 +28,14 @@ import urllib
 # import importlib
 from dotenv import load_dotenv
 
-# 加载.env文件
-load_dotenv()
+# # 加载.env文件
+# load_dotenv()
 
-# 读取COOKIE变量
-COOKIE = os.getenv('COOKIE', 'need your cookie')
+# # 读取COOKIE变量
+# COOKIE = os.getenv('COOKIE', 'need your cookie')
 
-print(COOKIE)
+# print(COOKIE)
+
 
 class Fake115Client(object):
 
@@ -244,7 +246,8 @@ class Fake115Client(object):
             return False
 
     def show_folder_path(self):
-        url = 'https://webapi.115.com/files?aid=1&cid='+self.cid + \
+        print('self.cid', self.cid)
+        url = 'https://webapi.115.com/files?aid=1&cid='+str(self.cid) + \
             '&o=user_ptime&asc=0&offset=0&show_dir=1&limit=115&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&type=&star=&is_q=&is_share='
         r = requests.get(url, headers=self.header)
         resp = json.loads(r.content)['path']
@@ -322,6 +325,9 @@ class Fake115Client(object):
 
         r = requests.post(url,  data=(
             postData.encode('utf8')), headers=self.header)
+
+        print("r.content",r.content)
+
         response = (r.content)
 
         try:
@@ -383,7 +389,7 @@ class Fake115Client(object):
                     break
                 sha1.update(data)
             totalhash = sha1.hexdigest().upper()
-
+            print(totalhash)
             ret = self.import_file_with_sha1(
                 blockhash, totalhash, self.get_file_size(filename), os.path.basename(filename))
             return ret
@@ -438,8 +444,8 @@ class Fake115Client(object):
             self.import_file_with_sha1(preid, fileid, filesize, filename)
 
     def upload_file(self, filename):
-        if self.upload_file_with_sha1(filename):
-            return
+        # if self.upload_file_with_sha1(filename):
+        #     return
 
         self.log("Trying  local  upload...", False, "INFO")
         uri = 'http://uplb.115.com/3.0/sampleinitupload.php'
@@ -462,6 +468,7 @@ class Fake115Client(object):
                              boundary='----7d4a6d158c9'
                              )
         r = requests.post(resp['host'], headers=req_headers, data=m)
+        print(r.content)
         try:
             if json.loads(r.content)['state'] == True and json.loads(r.content)['code'] == 0:
                 self.log(os.path.basename(filename) +
@@ -557,36 +564,158 @@ Usage:
     )
 
 
+class Main:
+    def __init__(self, targetpath=None, c=None, cid=None, cookies=None):
+        self._targetpath = targetpath or '.'
+        self._cid = c or cid
+        # print(self._cid,c,cid)
+        # 加载.env文件
+        load_dotenv()
+        # 读取COOKIE变量
+        self._cookies = cookies or os.getenv('COOKIE', 'need your cookie')
+
+        print(self._cookies)
+        # print(targetpath, c, cid)
+        # sys.exit()
+        # return
+        if self._targetpath == None:
+            print("请传入targetpath作为目标路径", sys.stderr)
+            input("按任意键结束...")
+            sys.exit()
+        # print(self.cid, c, cid)
+
+        self.cli = Fake115Client(self._cookies)
+
+        if self.cli.user_key == None:
+            print("获取UserKey失败，请检查Cookie的有效性！", sys.stderr)
+            sys.exit()
+
+        if self._cid != None:
+            self.cli.cid = self._cid
+            self.cli.show_folder_path()
+        # self.targetpath = targetpath
+
+        # global global_targetpath
+        # global_targetpath = self.targetpath or '.'
+        # if command == None or value == None:
+        #     usage()
+        #     input("按任意键结束...")
+        #     sys.exit()
+
+        # self.cid = cid
+        # self.cli = Fake115Client(COOKIE)
+        # if not self.cli.user_key:
+        #     sys.exit("无法获取用户密钥")
+
+    def upload(self, filename):
+        if filename == None:
+            usage()
+            input("按任意键结束...")
+            return
+
+        self.cli.upload_file(filename)
+
+    def infile(self, filename):
+        if filename == None:
+            usage()
+            input("按任意键结束...")
+            return
+
+        self.cli.import_file_from_link(filename)
+
+    def export(self, filename):
+        if filename == None:
+            usage()
+            input("按任意键结束...")
+            return
+
+        self.cli.export_link_to_file(filename, self.cid)
+        print('Total file count :', self.cli.filecount)
+
+    def build(self, filename):
+        if filename == None:
+            usage()
+            input("按任意键结束...")
+            return
+
+        self.cli.build_links_from_disk(filename)
+
+# def main(targetpath=None, command=None,  value=None, c=None, cid=None):
+#     if targetpath == None:
+#         print("请传入targetpath作为目标路径", sys.stderr)
+#         input("按任意键结束...")
+#         sys.exit()
+#     if command == None or value == None:
+#         usage()
+#         input("按任意键结束...")
+#         sys.exit()
+
+#     global global_targetpath
+#     global_targetpath = targetpath or '.'
+#     cli = Fake115Client(COOKIE)
+
+#     if cli.user_key == None:
+#         sys.exit()
+
+#     _cid = c or cid
+#     print(_cid, c, cid)
+#     if _cid != None:
+#         cli.cid = _cid
+#         cli.show_folder_path()
+
+#     if command in ("-u", "--upload"):
+#         cli.upload_file(value)
+#         # create_shortcut_from_yaml()
+#     elif command in ('-i', '--infile'):
+#         cli.import_file_from_link(value)
+#     elif command in ('-o', '--outfile'):
+#         cli.export_link_to_file(value, cli.cid)
+#         print('Total  file  count  :', cli.filecount)
+#     elif command in ('-b', '--build'):
+#         cli.build_links_from_disk(value)
+#     else:
+#         usage()
+#         input("按任意键结束...")
+#         sys.exit()
+    # cutmovie(filename=command,all=all)
+    # if command is None:
+    #     setup_default_directory()
+
+
 if __name__ == '__main__':
+    # cli = CLI()
+    fire.Fire(Main)
 
-    if len(sys.argv) < 2:
-        usage()
-        sys.exit()
+# if __name__ == '__main__':
 
-    cli = Fake115Client(COOKIE)
+    # if len(sys.argv) < 2:
+    #     usage()
+    #     sys.exit()
 
-    if cli.user_key == None:
-        sys.exit()
+    # cli = Fake115Client(COOKIE)
 
-    try:
-        opts,  args = getopt.getopt(
-            sys.argv[1:],  "u:i:o:b:c:",  ["help",  "output="])
-        for n, v in opts:
-            if n in ('-c', '--cid'):
-                cli.cid = v
-                cli.show_folder_path()
-        for n, v in opts:
-            if n in ('-u', '--upload'):
-                cli.upload_file(v)
-            # elif  n  in  ('-uf','--upload folder'):
-            #         cli.upload_folder(v)
-            elif n in ('-i', '--infile'):
-                cli.import_file_from_link(v)
-            elif n in ('-o', '--outfile'):
-                cli.export_link_to_file(v, cli.cid)
-                print('Total  file  count  :', cli.filecount)
-            elif n in ('-b', '--build'):
-                cli.build_links_from_disk(v)
+    # if cli.user_key == None:
+    #     sys.exit()
 
-    except getopt.GetoptError:
-        print("Argv  error,please  input")
+    # try:
+    #     opts,  args = getopt.getopt(
+    #         sys.argv[1:],  "u:i:o:b:c:",  ["help",  "output="])
+    #     for n, v in opts:
+    #         if n in ('-c', '--cid'):
+    #             cli.cid = v
+    #             cli.show_folder_path()
+    # for n, v in opts:
+    # if n in ('-u', '--upload'):
+    #     cli.upload_file(v)
+    # elif  n  in  ('-uf','--upload folder'):
+    #         cli.upload_folder(v)
+    # elif n in ('-i', '--infile'):
+    #     cli.import_file_from_link(v)
+    # elif n in ('-o', '--outfile'):
+    #     cli.export_link_to_file(v, cli.cid)
+    #     print('Total  file  count  :', cli.filecount)
+    # elif n in ('-b', '--build'):
+    #     cli.build_links_from_disk(v)
+
+    # except getopt.GetoptError:
+    #     print("Argv  error,please  input")
