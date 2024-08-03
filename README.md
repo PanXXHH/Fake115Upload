@@ -1,11 +1,11 @@
 
 
-# 115UPLOAD / 115上传带本地释放（python版）
+# Fake115Upload / 115上传文件神器
 
 <p align="center">
-<a href="https://github.com/Dineshkarthik/telegram_media_downloader/actions"><img alt="Unittest" src="https://github.com/Dineshkarthik/telegram_media_downloader/workflows/Unittest/badge.svg"></a>
-<a href="https://codecov.io/gh/Dineshkarthik/telegram_media_downloader"><img alt="Coverage Status" src="https://codecov.io/gh/Dineshkarthik/telegram_media_downloader/branch/master/graph/badge.svg"></a>
-<a href="https://github.com/Dineshkarthik/telegram_media_downloader/blob/master/LICENSE"><img alt="License: MIT" src="https://black.readthedocs.io/en/stable/_static/license.svg"></a>
+<a href="https://github.com/PanXXHH/Fake115Upload/actions"><img alt="Unittest" src="https://github.com/PanXXHH/Fake115Upload/workflows/Unittest/badge.svg"></a>
+<a href="https://codecov.io/gh/PanXXHH/Fake115Upload"><img alt="Coverage Status" src="https://codecov.io/gh/PanXXHH/Fake115Upload/branch/master/graph/badge.svg"></a>
+<a href="https://github.com/PanXXHH/Fake115Upload/blob/master/LICENSE"><img alt="License: MIT" src="https://black.readthedocs.io/en/stable/_static/license.svg"></a>
 <a href="https://github.com/python/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
 
@@ -24,7 +24,7 @@
 
 ## 项目介绍
 
-这是一个从 [Dineshkarthik 的 Telegram Media Downloader 项目](https://github.com/Dineshkarthik/telegram_media_downloader) fork 的项目。非常感谢原作者的出色工作！
+这是一个从 [T3rry7f 的 Fake115Upload 项目](https://github.com/T3rry7f) fork 的项目。非常感谢原作者的出色工作！
 
 ## 分叉的更改 (PanXXHH)
 
@@ -66,16 +66,16 @@ Telegram 媒体下载器可以从您参与的 Telegram 对话或频道中下载�
 对于支持 `make` 的 Unix 操作系统：
 
 ```sh
-$ git clone https://github.com/PanXXHH/telegram_media_downloader.git
-$ cd telegram_media_downloader
+$ git clone https://github.com/PanXXHH/Fake115Upload.git
+$ cd Fake115Upload
 $ make install
 ```
 
 对于没有内置 `make` 的 Windows 系统：
 
 ```sh
-$ git clone https://github.com/PanXXHH/telegram_media_downloader.git
-$ cd telegram_media_downloader
+$ git clone https://github.com/PanXXHH/Fake115Upload.git
+$ cd Fake115Upload
 $ pip3 install -r requirements.txt
 ```
 
@@ -178,14 +178,14 @@ proxy:
 
 ### 贡献指南
 
-请阅读我们的 [贡献指南](https://github.com/Dineshkarthik/telegram_media_downloader/blob/master/CONTRIBUTING.md) 了解我们的提交流程、编码规则等。
+请阅读我们的 [贡献指南](https://github.com/PanXXHH/Fake115Upload/blob/master/CONTRIBUTING.md) 了解我们的提交流程、编码规则等。
 
 ### 想要帮助？
 
-想要报告问题、贡献代码或改进文档？太好了！请阅读我们的 [贡献指南](https://github.com/Dineshkarthik/telegram_media_downloader/blob/master/CONTRIBUTING.md) 了解详细信息。
+想要报告问题、贡献代码或改进文档？太好了！请阅读我们的 [贡献指南](https://github.com/PanXXHH/Fake115Upload/blob/master/CONTRIBUTING.md) 了解详细信息。
 
 ### 行为准则
 
-帮助我们保持 Telegram 媒体下载器开放和包容。请阅读并遵循我们的 [行为准则](https://github.com/Dineshkarthik/telegram_media_downloader/blob/master/CODE_OF_CONDUCT.md)。
+帮助我们保持 Telegram 媒体下载器开放和包容。请阅读并遵循我们的 [行为准则](https://github.com/PanXXHH/Fake115Upload/blob/master/CODE_OF_CONDUCT.md)。
 
 # For Research Purposes Only

@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # coding:  utf-8
 
-import fire
+# import fire
 
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from Crypto.Util.number import bytes_to_long, long_to_bytes
