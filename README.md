@@ -24,7 +24,7 @@
 
 ## 项目介绍
 
-这是一个从 [T3rry7f 的 Fake115Upload(v) 项目](https://github.com/T3rry7f/Fake115Upload) fork 的项目。非常感谢原作者的出色工作！
+这是一个从 [T3rry7f 的 Fake115Upload(v1.0) 项目](https://github.com/T3rry7f/Fake115Upload) fork 的项目。非常感谢原作者的出色工作！
 
 ## 贡献
 
@@ -38,6 +38,6 @@
 
 ### 行为准则
 
-帮助我们保持 Telegram 媒体下载器开放和包容。请阅读并遵循我们的 [行为准则](https://github.com/PanXXHH/Fake115Upload/blob/master/CODE_OF_CONDUCT.md)。
+帮助我们保持 Fake115Upload 开放和包容。请阅读并遵循我们的 [行为准则](https://github.com/PanXXHH/Fake115Upload/blob/master/CODE_OF_CONDUCT.md)。
 
 # For Research Purposes Only
