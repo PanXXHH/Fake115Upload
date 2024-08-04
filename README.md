@@ -24,7 +24,7 @@
 
 ## 项目介绍
 
-这是一个从 [T3rry7f 的 Fake115Upload 项目](https://github.com/T3rry7f) fork 的项目。非常感谢原作者的出色工作！
+这是一个从 [T3rry7f 的 Fake115Upload(v) 项目](https://github.com/T3rry7f/Fake115Upload) fork 的项目。非常感谢原作者的出色工作！
 
 ## 分叉的更改 (PanXXHH)
 
