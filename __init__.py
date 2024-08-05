@@ -43,6 +43,8 @@ class Main:
 
         self.cli = Fake115Client.Fake115Client(self._cookies)
 
+        self.test()
+
         if self._cid != None:
             self.cli.cid = self._cid
             self.cli.show_folder_path()
