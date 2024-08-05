@@ -1,12 +1,12 @@
 #!/usr/local/bin/python3
 # coding:  utf-8
 
+from http import cookies
 import fire
 import sys
 import os
 from dotenv import load_dotenv
 from utils import Fake115Client
-
 
 
 def usage():
@@ -43,19 +43,29 @@ class Main:
 
         self.cli = Fake115Client.Fake115Client(self._cookies)
 
+        if self._cid != None:
+            self.cli.cid = self._cid
+            self.cli.show_folder_path()
+
+    def test(self):
         if self.cli.user_key == None:
             print("获取UserKey失败，请检查Cookie的有效性！", sys.stderr)
             sys.exit()
 
-        if self._cid != None:
-            self.cli.cid = self._cid
-            self.cli.show_folder_path()
 
     def uploadf(self, targetpath=None):
 
         _targetpath = targetpath or self._targetpath
 
-        self.cli.upload_directory(_targetpath, free=self._free)
+        self.cli.upload_directory(
+            _targetpath, free=self._free)
+
+    def uploadf(self, targetpath=None):
+
+        _targetpath = targetpath or self._targetpath
+
+        self.cli.upload_directory(
+            _targetpath, cookies=self.cookies, free=self._free)
 
     def upload(self, filename):
         if filename == None:

@@ -12,13 +12,13 @@
 # Usage:
 
 ```
--c  --cid cid     : Folder cid
---free: Uploaded will free local file or folder
---uploadf directory_name: Upload a directory form local disk
---upload filename: Upload a file form local disk
---infile filename: Import files form  hashlink list
---export filename: Export file hashlink from 115
---build filename: Build file hashlink from local disk
+-c  --cid  cid     : Folder cid
+--free:    Uploaded will free local file or folder
+uploadf:   directory_name: Upload a directory form local disk
+upload:    filename: Upload a file form local disk
+infile:    filename: Import files form  hashlink list
+export:    filename: Export file hashlink from 115
+build:     filename: Build file hashlink from local disk
 ```
 
 

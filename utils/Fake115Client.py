@@ -642,7 +642,7 @@ class Fake115Client(object):
                 'asc': '0',
                 'offset': '0',
                 'show_dir': '1',
-                'limit': '40',
+                'limit': '1',  # 获取个数，由于这里暂时不知道要获取多少，因此利用1进行获取总数
                 'code': '',
                 'scid': '',
                 'snap': '0',
@@ -664,18 +664,31 @@ class Fake115Client(object):
 
             resp_json = json.loads(resp.content)
 
+            count = resp_json['count']
+
+            params['limit'] = str(count)  # 直接获取文件夹内所有文件或文件夹信息
+
+            resp = requests.get("https://webapi.115.com/files",
+                                params=params, headers=headers)
+
+            resp_json = json.loads(resp.content)
+
             for params in resp_json['data']:
                 if 'ns' not in params:
                     continue  # 说明不是文件夹
+
+                # print("params['ns'], _name", params['ns'], _name)
 
                 if params['ns'] == _name:
                     __cid = params['cid']
                     break
 
-            if __cid is not None:
-                return __ReturnClass(isExist=__isExist, cid=__cid)
+            if __cid is None:
+                print("__isExist, __cid", __isExist, __cid)
+                raise Exception("获取文件夹CID失败！")
+
+            return __ReturnClass(isExist=__isExist, cid=__cid)
 
         else:
             print(resp_json, sys.stderr)
             raise Exception("创建文件夹失败！未知错误！")
-
