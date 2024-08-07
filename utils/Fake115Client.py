@@ -505,7 +505,7 @@ class Fake115Client(object):
 
         return
 
-    def upload_directory(self, target_path: str, free=False):
+    def upload_directory(self, target_path: str, free=False, ignore_file_types: list[str] = ['.uploaded'], ignore_empty_folders: bool = True):
 
         _targetpath = os.path.abspath(target_path)
         # _free = free
@@ -515,6 +515,22 @@ class Fake115Client(object):
         def dfs_walk(dir_path, parent_cid=None):
 
             dir_name = os.path.basename(dir_path)
+
+            files = []  # 用于存放当前目录下的文件名
+            directories = []  # 用于存放当前目录下的子目录名
+
+            # 遍历当前目录，并分别存储文件和目录
+            for entry in os.listdir(dir_path):
+                full_path = os.path.join(dir_path, entry)
+                if os.path.isdir(full_path):
+                    directories.append(full_path)
+                elif not any(entry.endswith(ext) for ext in ignore_file_types):
+                    files.append(entry)
+
+            # 检查是否忽略空文件夹
+            if ignore_empty_folders and not files and not directories:
+                print(f"忽略空文件夹（其中可能包括已上传后缀文件 .uploaded文件）: {dir_path}")
+                return
 
             if parent_cid is None:  # 判断是否是顶层目录
                 cid = self.cid  # 顶层目录的CID设为0
@@ -533,17 +549,6 @@ class Fake115Client(object):
 
             # 输出当前目录路径和CID
             print(f"当前目录: {dir_path} (CID: {cid}, 父目录CID: {parent_cid})")
-
-            files = []  # 用于存放当前目录下的文件名
-            directories = []  # 用于存放当前目录下的子目录名
-
-            # 遍历当前目录，并分别存储文件和目录
-            for entry in os.listdir(dir_path):
-                full_path = os.path.join(dir_path, entry)
-                if os.path.isdir(full_path):
-                    directories.append(full_path)
-                else:
-                    files.append(entry)
 
             # 输出当前目录下的所有文件
             if files:

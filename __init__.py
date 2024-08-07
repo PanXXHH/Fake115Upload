@@ -1,27 +1,11 @@
 #!/usr/local/bin/python3
 # coding:  utf-8
 
-from http import cookies
 import fire
 import sys
 import os
 from dotenv import load_dotenv
 from utils import Fake115Client
-
-
-def usage():
-    print(
-        """
-Usage:
--c  --cid cid     : Folder cid
---free: Uploaded will free local file or folder
---uploadf directory_name: Upload a directory form local disk
---upload filename: Upload a file form local disk
---infile filename: Import files form  hashlink list
---export filename: Export file hashlink from 115
---build filename: Build file hashlink from local disk
-"""
-    )
 
 
 class Main:
@@ -54,24 +38,18 @@ class Main:
             print("获取UserKey失败，请检查Cookie的有效性！", sys.stderr)
             sys.exit()
 
+    def uploadf(self, targetpath=None, ef: bool = False, empty_folder: bool = False):
 
-    def uploadf(self, targetpath=None):
-
+        # 使用not对布尔值进行取反
+        _ignore_empty_folders = not (ef or empty_folder)
         _targetpath = targetpath or self._targetpath
 
         self.cli.upload_directory(
-            _targetpath, free=self._free)
-
-    def uploadf(self, targetpath=None):
-
-        _targetpath = targetpath or self._targetpath
-
-        self.cli.upload_directory(
-            _targetpath, cookies=self.cookies, free=self._free)
+            _targetpath, free=self._free, ignore_empty_folders=_ignore_empty_folders)
 
     def upload(self, filename):
         if filename == None:
-            usage()
+            # usage()
             input("按任意键结束...")
             return
 
@@ -79,7 +57,7 @@ class Main:
 
     def infile(self, filename):
         if filename == None:
-            usage()
+            # usage()
             input("按任意键结束...")
             return
 
@@ -87,7 +65,7 @@ class Main:
 
     def export(self, filename):
         if filename == None:
-            usage()
+            # usage()
             input("按任意键结束...")
             return
 
@@ -96,7 +74,7 @@ class Main:
 
     def build(self, filename):
         if filename == None:
-            usage()
+            # usage()
             input("按任意键结束...")
             return
 
